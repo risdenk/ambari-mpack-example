@@ -1,0 +1,39 @@
+buildscript {
+  repositories {
+    mavenCentral()
+  }
+}
+
+apply plugin: 'idea'
+apply plugin: 'distribution'
+
+task wrapper(type: Wrapper) {
+  gradleVersion = '3.2'
+}
+
+ext.src = 'src/main/mpack/'
+
+distributions {
+  main {
+    contents {
+      baseName = packageName
+      from { src }
+
+      from { src + 'mpack.json' }
+      filter { String line ->
+        line.replace("{VERSION}", "${version}")
+      }
+    }
+  }
+}
+
+distTar {
+  destinationDir = file(buildDir)
+  appendix = 'mpack'
+  compression = Compression.GZIP
+  extension = 'tar.gz'
+}
+
+
+task makePackage(dependsOn: [clean, distTar]) {
+}
